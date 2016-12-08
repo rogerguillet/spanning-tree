@@ -1,0 +1,398 @@
+<html>
+<head>
+<!-- v. 1.01 -->
+
+<meta charset="UTF-8"/>
+<title>Spanning Tree</title>
+<script src="js/jquery/jquery-3.1.1.min.js"></script>
+
+<!-- START SIGMA IMPORTS -->
+<script src="js/sigmajs/src/sigma.core.js"></script>
+<script src="js/sigmajs/src/conrad.js"></script>
+<script src="js/sigmajs/src/utils/sigma.utils.js"></script>
+<script src="js/sigmajs/src/utils/sigma.polyfills.js"></script>
+<script src="js/sigmajs/src/sigma.settings.js"></script>
+<script src="js/sigmajs/src/classes/sigma.classes.dispatcher.js"></script>
+<script src="js/sigmajs/src/classes/sigma.classes.configurable.js"></script>
+<script src="js/sigmajs/src/classes/sigma.classes.graph.js"></script>
+<script src="js/sigmajs/src/classes/sigma.classes.camera.js"></script>
+<script src="js/sigmajs/src/classes/sigma.classes.quad.js"></script>
+<script src="js/sigmajs/src/classes/sigma.classes.edgequad.js"></script>
+<script src="js/sigmajs/src/captors/sigma.captors.mouse.js"></script>
+<script src="js/sigmajs/src/captors/sigma.captors.touch.js"></script>
+<script src="js/sigmajs/src/renderers/sigma.renderers.canvas.js"></script>
+<script src="js/sigmajs/src/renderers/sigma.renderers.webgl.js"></script>
+<script src="js/sigmajs/src/renderers/sigma.renderers.svg.js"></script>
+<script src="js/sigmajs/src/renderers/sigma.renderers.def.js"></script>
+<script src="js/sigmajs/src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="js/sigmajs/src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="js/sigmajs/src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="js/sigmajs/src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="js/sigmajs/src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="js/sigmajs/src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="js/sigmajs/src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="js/sigmajs/src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="js/sigmajs/src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="js/sigmajs/src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="js/sigmajs/src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="js/sigmajs/src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="js/sigmajs/src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="js/sigmajs/src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="js/sigmajs/src/misc/sigma.misc.animation.js"></script>
+<script src="js/sigmajs/src/misc/sigma.misc.bindEvents.js"></script>
+<script src="js/sigmajs/src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="js/sigmajs/src/misc/sigma.misc.drawHovers.js"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="js/sigmajs/plugins/sigma.plugins.dragNodes/sigma.plugins.dragNodes.js"></script>
+<script src="js/sigmajs/plugins/sigma.renderers.edgeLabels/settings.js"></script>
+<script src="js/sigmajs/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.def.js"></script>
+<script src="js/sigmajs/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curve.js"></script>
+<script src="js/sigmajs/plugins/sigma.renderers.edgeLabels/sigma.canvas.edges.labels.curvedArrow.js"></script>
+
+<style>
+h2 {
+    margin: 0px;
+}
+#graph {
+  top: 0;
+  bottom: 00;
+  left: 0;
+  right: 0;
+  position: absolute;
+}
+#sidebar {
+  bottom: 0;
+  right: 0;
+  width: 400px;
+  height: 100px;
+  position: absolute;
+  border-top: 3px solid #CCC;
+  border-left: 3px solid #CCC;
+  background-color: #FFF;
+  padding: 10px;
+}
+</style>
+</head>
+
+<body oncontextmenu="return false;">
+<div id="container">
+  <div id="graph-container">
+    <div id="graph"></div>
+  </div>
+  <div id="sidebar">
+  <h2>Control Area</h2>
+  <p>
+    <button id="btnPrimNext">Prim: Next Step</button>
+    <button id="btnReset">Reset</button>
+  </p>
+  </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+/*** DECLARE RUNTIME VARIABLES ***/
+
+// The instance of the sigma graph
+var sigmaInstance; 
+
+var graphJsonData;
+
+// The data of the graph
+var graph = {
+      nodes: [],
+      edges: []
+};
+
+// The runtime data for the algorithms calculation process
+var computation = {
+    kruskal: null,
+    prim: null
+};
+
+/*** LOAD GRAPH DATA ***/
+    
+// Load the places from a JSON source
+// On an environment with a server the json data should be loaded from an external file by using $.getJSON(...)
+graphJsonData = '[ { "id":"Genf", "label":"Genf", "x":0, "y":0, "size":1, "color":"#00F"}, { "id":"Basel", "label":"Basel", "x":110, "y":149, "size":1, "color":"#00F"}, { "id":"Bern", "label":"Bern", "x":99, "y":82, "size":1, "color":"#00F"}, { "id":"Zürich", "label":"Zürich", "x":183, "y":130, "size":1, "color":"#00F"}, { "id":"Luzern", "label":"Luzern", "x":167, "y":94, "size":1, "color":"#00F"}, { "id":"Zug", "label":"Zug", "x":182, "y":107, "size":1, "color":"#00F"} ]';
+
+/*** HELPER FUNCTIONS ***/
+
+// Loops through all existing nodes and adds an edge to each other node in the graph (if not exists).
+var createEdgesBetweenAllNodes = function() {
+    var i, j, sourceNode, targetNode, distance;
+
+    graph.edges = [];
+    
+    for(i = 0; i < graph.nodes.length; i++) {
+        sourceNode = graph.nodes[i];
+
+        for(j = i+1; j < graph.nodes.length; j++) {
+            targetNode = graph.nodes[j];
+            
+            distance = calculateDistance(sourceNode, targetNode);
+            
+            graph.edges.push({id: sourceNode.id + targetNode.id, source: sourceNode.id, target: targetNode.id, distance: distance, label: 'd: ' + distance, size: Math.random(), type: 'curve', color: '#999', hover_color: '#000'});
+        }
+    }
+};
+
+var updateDistances = function() {
+    $.each(graph.edges, function(index, edge) {
+        var sourceNode = $.grep(graph.nodes, function(node) {
+            return edge.source === node.id;
+        });
+        var targetNode = $.grep(graph.nodes, function(node) {
+            return edge.target === node.id;
+        });
+        
+        var distance = calculateDistance(sourceNode[0], targetNode[0]);
+        
+        graph.edges[index].label = 'd: ' + distance;
+        graph.edges[index].distance = distance;
+    });
+}
+
+// Calculates the distance between two nodes by using the x and y coordinates.
+// The result is rounded to an integer.
+var calculateDistance = function(nodeOne, nodeTwo) {
+    var distance = Math.sqrt(
+        Math.pow((nodeOne.x - nodeTwo.x), 2)
+        +
+        Math.pow((nodeOne.y - nodeTwo.y), 2)
+    );
+    
+    distance = Math.round(distance);
+    
+    return distance;
+};
+
+var updateVisualGraph = function() {
+    sigmaInstance.graph.clear();
+    sigmaInstance.graph.read(graph);
+    sigmaInstance.refresh();
+};
+
+/*** PRIM ALGORITHM: SPANNING TREE ***/
+
+var primInitialize = function() {
+    computation.prim = {
+        stepNumber: 0,
+        visitedNodes: [],
+        remainingNodes: [],
+        visitedEdges: [],
+        remainingEdges: []
+    };
+    
+    // Copy all nodes and all edges
+    computation.prim.remainingNodes = graph.nodes.slice();
+    computation.prim.remainingEdges = graph.edges.slice();
+    
+    // Create a list of visited nodes and add the first node to the list
+    computation.prim.visitedNodes.push(computation.prim.remainingNodes[0]);
+    
+    // Remove the fist node
+    computation.prim.remainingNodes.splice(0, 1);
+}
+
+var primNextStep = function() {
+    if(computation.prim == null) {
+        primInitialize();
+    }
+    
+    computation.prim.stepNumber = computation.prim.stepNumber + 1;
+    
+    // get all edges that can be passed from the existing spanning tree
+    var edgeOptions = primGetEdgeOptions();
+    
+    if(computation.prim.remainingNodes.length == 0) {
+        var distance = 0;
+        
+        $.each(computation.prim.visitedEdges, function(index, edge){
+            distance = distance + edge.distance;
+        });
+    
+        alert("Done! The total distance of the minimum spanning tree is: " + distance);
+    } else {
+    
+        // get the edge with the lowest distance
+        edgeOptions.sort(function(x, y) {
+            return x.distance < y.distance ? -1 : x.distance > y.distance ? 1 : 0;
+        });
+        
+        var edgeWithLowestDistance = edgeOptions[0];
+        
+        // mark the new node as visited
+        $.each(computation.prim.remainingNodes.slice(), function(index, node) {
+            if(edgeWithLowestDistance.source == node.id
+            || edgeWithLowestDistance.target == node.id) {
+                computation.prim.remainingNodes.splice(index, 1);
+                computation.prim.visitedNodes.push(node);
+            }
+        });
+        
+        // mark the new edge as visited
+        $.each(computation.prim.remainingEdges.slice(), function(index, edge) {
+            if(edgeWithLowestDistance.id == edge.id) {
+                computation.prim.remainingEdges.splice(index, 1);
+                computation.prim.visitedEdges.push(edge);
+            }
+        });
+        
+        primVisualizeSpanningTree();
+        updateVisualGraph();
+    }
+};
+
+var primVisualizeSpanningTree = function() {
+    $.each(graph.nodes, function(index, node) {
+        $.each(computation.prim.visitedNodes, function(visitedIndex, visitedNode) {
+            if(node.id == visitedNode.id) {
+                graph.nodes[index].color = "#F00";
+            }
+        });
+    });
+    
+    $.each(graph.edges, function(index, edge) {
+        $.each(computation.prim.visitedEdges, function(visitedIndex, visitedEdge) {
+            if(edge.id == visitedEdge.id) {
+                graph.edges[index].size = 3;
+                graph.edges[index].color = "#F00";
+            }
+        });
+    });
+};
+
+var primGetEdgeOptions = function() {
+    var neighboringEdges = [];
+    
+    $.each(computation.prim.remainingEdges, function(index, edge) {
+        var visitedTarget = $.grep(computation.prim.visitedNodes, function(node) {
+            return edge.target === node.id;
+        });
+        var visitedSource = $.grep(computation.prim.visitedNodes, function(node) {
+            return edge.source === node.id;
+        });
+        
+        var isTargetNodeConnected = visitedTarget.length > 0;
+        var isSourceNodeConnected = visitedSource.length > 0;
+        
+        if((isTargetNodeConnected || isSourceNodeConnected)
+        && isTargetNodeConnected != isSourceNodeConnected) {
+            // At least the source or the target of this edge is already visited.
+            // So this edge is a neighbor of the existing spanning tree.
+            neighboringEdges.push(edge);
+        }
+    });
+    
+    return neighboringEdges;
+};
+
+
+/*** INITIALIZE GRAPH ***/
+
+var initialize = function() {
+    // Clear
+    graph = {
+          nodes: [],
+          edges: []
+    };
+    
+    computation = {
+        kruskal: null,
+        prim: null
+    };
+    
+    $('#graph').remove(); 
+    $('#graph-container').html('<div id="graph"></div>'); 
+
+    // Load the graph from JSON data
+    graph.nodes = $.parseJSON(graphJsonData);
+
+    // Instantiate sigma:
+    sigmaInstance = new sigma({
+      renderer: {
+        container: document.getElementById('graph'),
+        type: 'canvas'
+      },
+      settings: {
+        edgeLabelSize: 'fixed',
+        edgeLabelSizePowRatio: 20,
+        edgeLabelThreshold: 0,
+        labelThreshold: 0,
+        defaultLabelSize: 26,
+        defaultEdgeLabelSize: 20,
+        enableEdgeHovering: true,
+        edgeHoverColor: 'edge',
+        defaultEdgeHoverColor: '#000'
+      }
+    });
+    
+    sigmaInstance.camera.goTo({ ratio: 1.05});
+
+    createEdgesBetweenAllNodes();
+    updateVisualGraph();
+    
+    // Handle clicking an edge
+    
+    sigmaInstance.bind("clickEdge", function (e) { 
+        var selectedEdge = e.data.edge;
+        
+        graph.edges = $.grep(graph.edges, function(edge) {
+            return selectedEdge.id != edge.id;
+        });
+        
+        updateVisualGraph();
+    });
+    
+    // Handle drag&drop of nodes
+
+    // Initialize the dragNodes plugin:
+    var dragListener = sigma.plugins.dragNodes(sigmaInstance, sigmaInstance.renderers[0]);
+
+    dragListener.bind('drop', function(event) {
+      var draggedNode = event.data.node;
+      
+      // update node coordinates
+      for(var i = 0; i < graph.nodes.length; i++) {
+        if(graph.nodes[i].id === draggedNode.id) {
+            graph.nodes[i].x = draggedNode.x;
+            graph.nodes[i].y = draggedNode.y;
+        }
+      }
+      
+      updateDistances();
+      updateVisualGraph();
+    });
+
+};
+
+
+
+/*** REGISTER GUI EVENT HANDLERS ***/
+
+$('#btnPrimNext').click(function() {
+    primNextStep();
+});
+
+$('#btnReset').click(function() {
+    initialize();
+});
+
+// On-load initization
+initialize();
+});
+</script>
+</body>
+</html>

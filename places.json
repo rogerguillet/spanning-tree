@@ -1,0 +1,8 @@
+[
+    { "id":"Genf", "label":"Genf", "x":0, "y":0, "size":1, "color":"#F00"},
+    { "id":"Basel", "label":"Basel", "x":110, "y":149, "size":1, "color":"#F00"},
+    { "id":"Bern", "label":"Bern", "x":99, "y":82, "size":1, "color":"#F00"},
+    { "id":"Zürich", "label":"Zürich", "x":183, "y":130, "size":1, "color":"#F00"},
+    { "id":"Luzern", "label":"Luzern", "x":167, "y":94, "size":1, "color":"#F00"},
+    { "id":"Zug", "label":"Zug", "x":182, "y":107, "size":1, "color":"#F00"}
+]
