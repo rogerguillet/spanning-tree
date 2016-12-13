@@ -94,6 +94,7 @@ h2 {
   <h2>Control Area</h2>
   <p>
     <button id="btnPrimNext">Prim: Next Step</button>
+    <button id="btnKruskalNext">Kruskal: Next Step</button>
     <button id="btnReset">Reset</button>
   </p>
   </div>
@@ -101,12 +102,17 @@ h2 {
 
 <script src="js/sp-alg.js"></script>
 <script src="js/sp-alg.prim.js"></script>
+<script src="js/sp-alg.kruskal.js"></script>
 <script>
 $(document).ready(function() {
     /*** REGISTER GUI EVENT HANDLERS ***/
 
     $('#btnPrimNext').click(function() {
         spAlg.prim.nextStep();
+    });
+
+    $('#btnKruskalNext').click(function() {
+        spAlg.kruskal.nextStep();
     });
 
     $('#btnReset').click(function() {

@@ -1,27 +1,36 @@
-/*** PRIM ALGORITHM: SPANNING TREE ***/
+/*** PRIM ALGORITHM FOR COLACULATING A MINIMUM SPANNING TREE ***/
 spAlg.prim = {};
 
 spAlg.prim.initialize = function() {
     spAlg.prim.runtime = {
         stepNumber: 0,
-        visitedNodes: [],
-        remainingNodes: [],
-        visitedEdges: [],
-        remainingEdges: []
+        visitedNodes: [],   // For visulization and to get the neighbors.
+        remainingNodes: [], // To check whether all nodes are visited.
+        visitedEdges: [],   // To calculate the total distance.
+        remainingEdges: []  // To get the neighboring edges.
     };
-    
-    // Copy all nodes and all edges
+}
+
+spAlg.prim.prepareFirstStep = function() {
+    // Copy all nodes and all edges from the existing graph
     spAlg.prim.runtime.remainingNodes = spAlg.graph.nodes.slice();
     spAlg.prim.runtime.remainingEdges = spAlg.graph.edges.slice();
+    
+    // Start with the first node from the list.
+    // Which node is selected first doesn't matter for the Prim Alogrithm.
     
     // Create a list of visited nodes and add the first node to the list
     spAlg.prim.runtime.visitedNodes.push(spAlg.prim.runtime.remainingNodes[0]);
     
     // Remove the fist node
     spAlg.prim.runtime.remainingNodes.splice(0, 1);
-}
+};
 
 spAlg.prim.nextStep = function() {
+    if(spAlg.prim.runtime.stepNumber == 0) {
+        spAlg.prim.prepareFirstStep();
+    }
+    
     spAlg.prim.runtime.stepNumber = spAlg.prim.runtime.stepNumber + 1;
     
     // get all edges that can be passed from the existing spanning tree
@@ -62,28 +71,9 @@ spAlg.prim.nextStep = function() {
         });
         
         // Paint the spanning tree and update the graph
-        spAlg.prim.visualizeSpanningTree();
+        spAlg.visualizeSpanningTree(spAlg.prim.runtime.visitedNodes, spAlg.prim.runtime.visitedEdges);
         spAlg.updateVisualGraph();
     }
-};
-
-spAlg.prim.visualizeSpanningTree = function() {
-    $.each(spAlg.graph.nodes, function(index, node) {
-        $.each(spAlg.prim.runtime.visitedNodes, function(visitedIndex, visitedNode) {
-            if(node.id == visitedNode.id) {
-                spAlg.graph.nodes[index].color = "#F00";
-            }
-        });
-    });
-    
-    $.each(spAlg.graph.edges, function(index, edge) {
-        $.each(spAlg.prim.runtime.visitedEdges, function(visitedIndex, visitedEdge) {
-            if(edge.id == visitedEdge.id) {
-                spAlg.graph.edges[index].size = 3;
-                spAlg.graph.edges[index].color = "#F00";
-            }
-        });
-    });
 };
 
 spAlg.prim.getEdgeOptions = function() {

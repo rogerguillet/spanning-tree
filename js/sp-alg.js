@@ -36,7 +36,7 @@ spAlg.getEdgesBetweenAllNodes = function(listOfNodes) {
             
             distance = spAlg.calculateDistance(sourceNode, targetNode);
             
-            listOfEdges.push({id: sourceNode.id + targetNode.id, source: sourceNode.id, target: targetNode.id, distance: distance, label: 'd: ' + distance, size: Math.random(), type: 'curve', color: '#999', hover_color: '#000'});
+            listOfEdges.push({id: sourceNode.id + targetNode.id, source: sourceNode.id, target: targetNode.id, distance: distance, label: 'd: ' + distance, type: 'curve', color: '#999', hover_color: '#000'});
         }
     }
     
@@ -71,6 +71,25 @@ spAlg.calculateDistance = function(nodeOne, nodeTwo) {
     distance = Math.round(distance);
     
     return distance;
+};
+
+spAlg.visualizeSpanningTree = function(listOfVisitedNodes, listOfVisitedEdges) {
+    $.each(spAlg.graph.nodes, function(index, node) {
+        $.each(listOfVisitedNodes, function(visitedIndex, visitedNode) {
+            if(node.id == visitedNode.id) {
+                spAlg.graph.nodes[index].color = "#F00";
+            }
+        });
+    });
+    
+    $.each(spAlg.graph.edges, function(index, edge) {
+        $.each(listOfVisitedEdges, function(visitedIndex, visitedEdge) {
+            if(edge.id == visitedEdge.id) {
+                spAlg.graph.edges[index].size = 8;
+                spAlg.graph.edges[index].color = "#F00";
+            }
+        });
+    });
 };
 
 spAlg.updateVisualGraph = function() {
