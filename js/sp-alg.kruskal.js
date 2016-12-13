@@ -43,6 +43,11 @@ spAlg.kruskal.nextStep = function() {
             // Get the shortest edge and remove it from the list of remaining edges.
             var shortestEdge = spAlg.kruskal.runtime.remainingEdges.splice(0, 1)[0];
             
+            if(shortestEdge === undefined) {
+                alert("No more edges available.");
+                return
+            }
+            
             // Check whether the edge would create a circle. If not add it to the spanning tree. 
             isPathWithoutCircle = spAlg.kruskal.processEdge(shortestEdge) == false;
             

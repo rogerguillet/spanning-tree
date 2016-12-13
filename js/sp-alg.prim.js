@@ -45,6 +45,11 @@ spAlg.prim.nextStep = function() {
     
         alert("Done! The total distance of the minimum spanning tree is: " + distance);
     } else {
+        if(edgeOptions.length == 0) {
+            alert("No more edges available.");
+            return
+        }
+        
         // Ascending order by distance
         edgeOptions.sort(function(x, y) {
             return x.distance < y.distance ? -1 : x.distance > y.distance ? 1 : 0;
