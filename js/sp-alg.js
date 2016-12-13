@@ -74,21 +74,35 @@ spAlg.calculateDistance = function(nodeOne, nodeTwo) {
 };
 
 spAlg.visualizeSpanningTree = function(listOfVisitedNodes, listOfVisitedEdges) {
+    // Search for all visited nodes and change the color
     $.each(spAlg.graph.nodes, function(index, node) {
+        var isVisited = false;
         $.each(listOfVisitedNodes, function(visitedIndex, visitedNode) {
-            if(node.id == visitedNode.id) {
-                spAlg.graph.nodes[index].color = "#F00";
-            }
+            if(node.id == visitedNode.id) { isVisited = true; }
         });
+        
+        if(isVisited) {
+            spAlg.graph.nodes[index].color = "#F00";
+        } else {
+            spAlg.graph.nodes[index].color = "#00F";
+        }
     });
     
+    // Search for all visited nodes and change the line style
     $.each(spAlg.graph.edges, function(index, edge) {
+        var isVisited = false;
+        
         $.each(listOfVisitedEdges, function(visitedIndex, visitedEdge) {
-            if(edge.id == visitedEdge.id) {
-                spAlg.graph.edges[index].size = 2;
-                spAlg.graph.edges[index].color = "#F00";
-            }
+            if(edge.id == visitedEdge.id) { isVisited = true; }
         });
+        
+        if(isVisited) {
+            spAlg.graph.edges[index].size = 2;
+            spAlg.graph.edges[index].color = "#F00";
+        } else {
+            spAlg.graph.edges[index].size = 0;
+            spAlg.graph.edges[index].color = "#999";
+        }
     });
 };
 
