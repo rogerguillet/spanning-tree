@@ -62,26 +62,27 @@
 
 <style>
 h2 {
-    margin: 0px;
+    margin: 0px; font-size: 16px;
 }
 #graph {
   top: 0;
-  bottom: 00;
+  bottom: 0;
   left: 0;
-  right: 0;
+  right: 100px;
   position: absolute;
 }
 #sidebar {
   bottom: 0;
   right: 0;
-  width: 400px;
-  height: 100px;
+  width: 150px;
+  height: 120px;
   position: absolute;
   border-top: 3px solid #CCC;
   border-left: 3px solid #CCC;
   background-color: #FFF;
   padding: 10px;
 }
+button { margin: 4px 0px 4px 0px; width: 100% }
 </style>
 </head>
 
@@ -93,9 +94,9 @@ h2 {
   <div id="sidebar">
   <h2>Control Area</h2>
   <p>
+    <button id="btnReset">Reset</button>
     <button id="btnPrimNext">Prim: Next Step</button>
     <button id="btnKruskalNext">Kruskal: Next Step</button>
-    <button id="btnReset">Reset</button>
   </p>
   </div>
 </div>
