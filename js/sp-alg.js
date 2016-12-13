@@ -36,7 +36,7 @@ spAlg.getEdgesBetweenAllNodes = function(listOfNodes) {
             
             distance = spAlg.calculateDistance(sourceNode, targetNode);
             
-            listOfEdges.push({id: sourceNode.id + targetNode.id, source: sourceNode.id, target: targetNode.id, distance: distance, label: 'd: ' + distance, type: 'curve', color: '#999', hover_color: '#000'});
+            listOfEdges.push({id: sourceNode.id + targetNode.id, source: sourceNode.id, target: targetNode.id, distance: distance, label: 'd: ' + distance, type: 'curve', size: 0, color: '#999', hover_color: '#000'});
         }
     }
     
@@ -85,7 +85,7 @@ spAlg.visualizeSpanningTree = function(listOfVisitedNodes, listOfVisitedEdges) {
     $.each(spAlg.graph.edges, function(index, edge) {
         $.each(listOfVisitedEdges, function(visitedIndex, visitedEdge) {
             if(edge.id == visitedEdge.id) {
-                spAlg.graph.edges[index].size = 8;
+                spAlg.graph.edges[index].size = 2;
                 spAlg.graph.edges[index].color = "#F00";
             }
         });
@@ -126,6 +126,8 @@ spAlg.initialize = function() {
         edgeLabelSize: 'fixed',
         edgeLabelSizePowRatio: 20,
         edgeLabelThreshold: 0,
+        minEdgeSize: 1,
+        maxEdgeSize: 5,
         labelThreshold: 0,
         defaultLabelSize: 26,
         defaultEdgeLabelSize: 20,
@@ -151,6 +153,11 @@ spAlg.initialize = function() {
         spAlg.kruskal.initialize();
     }
     
+    
+    
+spAlg.sigmaInstance.bind("overEdge", () => {
+    console.log("overEdge");
+});
     
     // Handle clicking an edge
     
