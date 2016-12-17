@@ -167,12 +167,6 @@ spAlg.initialize = function() {
         spAlg.kruskal.initialize();
     }
     
-    
-    
-spAlg.sigmaInstance.bind("overEdge", () => {
-    console.log("overEdge");
-});
-    
     // Handle clicking an edge
     
     spAlg.sigmaInstance.bind("clickEdge", function (e) { 
